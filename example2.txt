@@ -1,0 +1,3 @@
+cube 0 define position:300,300,0 size:200
+cube 1 define position:-150,-150,0 size:150
+sphere 2 define position:0,0,0 size:100
