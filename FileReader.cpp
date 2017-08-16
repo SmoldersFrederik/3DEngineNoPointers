@@ -48,9 +48,16 @@ FileReader::FileReader() {
 			positionY[counter] = atoi(position.substr(0, pos).c_str());
 			position.erase(0, pos + delimiter.length());
 			positionZ[counter] = atoi(position.c_str());
-			delimiter = ":";
+
+			delimiter = " ";
+			string sizeLine;
 			pos = line.find(delimiter);
-			size[counter] = atoi(line.erase(0, pos + delimiter.length()).c_str());
+			sizeLine = line.substr(0, pos);
+			line.erase(0, pos + delimiter.length());
+			delimiter = ":";
+			pos = sizeLine.find(delimiter);
+			size[counter] = atoi(sizeLine.erase(0, pos + delimiter.length()).c_str());
+			color[counter] = line;
 		}
 
 		counter++;
@@ -89,4 +96,8 @@ int* FileReader::getPositionZ() {
 
 int* FileReader::getSize() {
 	return size;
+}
+
+string* FileReader::getColor() {
+	return color;
 }

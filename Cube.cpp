@@ -15,7 +15,7 @@ Cube::Cube() {
 }
 
 Cube::Cube(Vector point1, Vector point2, Vector point3, Vector point4,
-		Vector point5, Vector point6, Vector point7, Vector point8) {
+		Vector point5, Vector point6, Vector point7, Vector point8, string color, int number) {
 	this->point1 = point1;
 	this->point2 = point2;
 	this->point3 = point3;
@@ -32,6 +32,8 @@ Cube::Cube(Vector point1, Vector point2, Vector point3, Vector point4,
 	this->plane6.setPlane(this->point3, this->point4, this->point8, this->point7);
 	this->planeLastIntersection = 0;
 	this->active = true;
+	this->color = color;
+	this->number = number;
 }
 
 Cube::~Cube() {
@@ -236,5 +238,13 @@ int Cube::getPlaneLastIntersection() {
 
 bool Cube::getActive() {
 	return active;
+}
+
+string Cube::getColor() {
+	return color;
+}
+
+int Cube::getNumber() {
+	return number;
 }
 

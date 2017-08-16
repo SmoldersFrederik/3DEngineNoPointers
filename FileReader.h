@@ -23,6 +23,7 @@ public:
 	int* getPositionY();
 	int* getPositionZ();
 	int* getSize();
+	string* getColor();
 
 
 
@@ -34,6 +35,7 @@ private:
 	int positionY[10];
 	int positionZ[10];
 	int size[10];
+	string color[10];
 };
 
 #endif /* FILEREADER_H_ */

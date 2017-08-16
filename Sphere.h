@@ -11,16 +11,24 @@
 #include "Vector.h"
 #include "Line.h"
 
+#include <iostream>
+
+using namespace std;
+
 class Sphere {
 public:
 	Sphere();
-	Sphere(double r, Vector middle);
+	Sphere(double r, Vector middle, string color, int number);
 	virtual ~Sphere();
 	Vector getMiddle();
 	Vector getFirstIntersectionWithSphere(Line line);
+	string getColor();
+	int getNumber();
 private:
 	double r;
 	Vector middle;
+	string color;
+	int number;
 };
 
 #endif /* SPHERE_H_ */

@@ -15,9 +15,11 @@ Sphere::Sphere() {
 
 }
 
-Sphere::Sphere(double r, Vector middle) {
+Sphere::Sphere(double r, Vector middle, string color, int number) {
 	this->r = r;
 	this->middle = middle;
+	this->color = color;
+	this->number = number;
 }
 
 Sphere::~Sphere() {
@@ -81,3 +83,10 @@ Vector Sphere::getFirstIntersectionWithSphere(Line line) {
 	}
 }
 
+string Sphere::getColor(){
+	return color;
+}
+
+int Sphere::getNumber() {
+	return number;
+}

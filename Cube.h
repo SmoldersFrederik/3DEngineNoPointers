@@ -14,10 +14,12 @@
 
 #include <iostream>
 
+using namespace std;
+
 class Cube {
 public:
 	Cube();
-	Cube(Vector point1, Vector point2, Vector point3, Vector point4, Vector point5, Vector point6, Vector point7, Vector point8);
+	Cube(Vector point1, Vector point2, Vector point3, Vector point4, Vector point5, Vector point6, Vector point7, Vector point8, string color, int number);
 	virtual ~Cube();
 	Vector getPoint1();
 	Vector getPoint2();
@@ -36,6 +38,8 @@ public:
 	Vector getFirstIntersectionWithCube(Line line);
 	int getPlaneLastIntersection();
 	bool getActive();
+	string getColor();
+	int getNumber();
 private:
 	Vector point1;
 	Vector point2;
@@ -53,6 +57,8 @@ private:
 	PlaneWithBoundaries plane6;
 	int planeLastIntersection;
 	bool active;
+	string color;
+	int number;
 };
 
 #endif /* CUBE_H_ */
