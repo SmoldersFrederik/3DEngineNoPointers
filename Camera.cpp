@@ -33,6 +33,7 @@ void Camera::rayTrace() {
 	Vector direction_vec = look_at.substractWithVector(camera_position_vec);
 	direction_vec.normalize();
 	Display display(1000, 800);
+	Vector light_point(0, 2000, 0, 1);
 
 
 	FileReader filereader;
@@ -79,20 +80,25 @@ void Camera::rayTrace() {
 
 
 	Vector intersectionWithCube;
-	Vector intersectionWithCube0;
-	Vector intersectionWithCube1;
-	Vector intersectionWithCube2;
-	Vector intersectionWithCube3;
-	Vector intersectionWithCube4;
-
 	Vector intersectionWithSphere;
 
 	Vector intersections[10];
 	vector<int> objectsFound;
 	double distanceToEye = 0;
-	int objectClosestIntersection = 1000;
+	int objectClosestIntersection = -1000;
 
-	//vector<Vector> intersectionWithCube;
+	double closestIntersection = 0;
+	double farestIntersection = 0;
+	double differenceFarestClosestIntersection = 0;
+
+
+	Vector validIntersection;
+	Vector firstIntersectionShadowRay;
+	int intersectionPlane;
+	int intersectionPlaneShadowRay;
+	Line shadowRay;
+	shadowRay.setPointA(light_point);
+
 
 	Line primaryRay;
 	primaryRay.setPointB(camera_position_vec);
@@ -103,92 +109,92 @@ void Camera::rayTrace() {
 			Vector P_3d_x = right_vec.multiplyWithValue(x - (display.getX() / 2));
 			Vector P_3d = camera_position_vec.sumWithVector(direction_vec.multiplyWithValue(screen_distance)).sumWithVector(P_3d_y).sumWithVector(P_3d_x);
 			primaryRay.setPointA(P_3d);
-			/*
+
 			for (int i = 0; i < cubes.size(); i++) {
 				intersectionWithCube = cubes[i].getFirstIntersectionWithCube(primaryRay);
 				if (intersectionWithCube.getDot() != 1000) {
-					if (cubes[i].getColor() == "red") {
-						objectColor.setHSV(0, 1, 1);
+					if (intersectionWithCube.distanceToPoint(light_point) > farestIntersection || farestIntersection == 0) {
+						farestIntersection = intersectionWithCube.distanceToPoint(light_point);
 					}
-					else if (cubes[i].getColor() == "green") {
-						objectColor.setHSV(120, 1, 1);
+					if (intersectionWithCube.distanceToPoint(light_point) < closestIntersection || closestIntersection == 0) {
+						closestIntersection = intersectionWithCube.distanceToPoint(light_point);
 					}
-					else if (cubes[i].getColor() == "lightblue") {
-						objectColor.setHSV(180, 1, 1);
-					}
-					else if (cubes[i].getColor() == "blue") {
-						objectColor.setHSV(251, 1, 1);
-					}
-					else if (cubes[i].getColor() == "yellow") {
-						objectColor.setHSV(50, 1, 1);
-					}
-					//objectColor.setHSV(180, 1, 1);
-					glColor3f(objectColor.getR(), objectColor.getG(), objectColor.getB());
-					glVertex2i(x, y);
 				}
 			}
-
 			for (int i = 0; i < spheres.size(); i++) {
 				intersectionWithSphere = spheres[i].getFirstIntersectionWithSphere(primaryRay);
 				if (intersectionWithSphere.getDot() != 1000) {
-					if (spheres[i].getColor() == "red") {
-						objectColor.setHSV(0, 1, 1);
+					if (intersectionWithSphere.distanceToPoint(light_point) > farestIntersection || farestIntersection == 0) {
+						farestIntersection = intersectionWithSphere.distanceToPoint(light_point);
 					}
-					else if (spheres[i].getColor() == "green") {
-						objectColor.setHSV(120, 1, 1);
+					if (intersectionWithSphere.distanceToPoint(light_point) < closestIntersection || closestIntersection == 0) {
+						closestIntersection = intersectionWithSphere.distanceToPoint(light_point);
 					}
-					else if (spheres[i].getColor() == "lightblue") {
-						objectColor.setHSV(180, 1, 1);
-					}
-					else if (spheres[i].getColor() == "blue") {
-						objectColor.setHSV(251, 1, 1);
-					}
-					else if (spheres[i].getColor() == "yellow") {
-						objectColor.setHSV(50, 1, 1);
-					}
-					glColor3f(objectColor.getR(), objectColor.getG(), objectColor.getB());
-					glVertex2i(x, y);
 				}
 			}
-			*/
-			///*
-			for (int i = 0; i < cubes.size(); i++) {
+			differenceFarestClosestIntersection = farestIntersection - closestIntersection;
+		}
+	}
+
+	for (int y = 0; y < display.getY(); y++) {
+		for (int x = 0; x < display.getX(); x++) {
+			Vector P_3d_y = up_vec.multiplyWithValue((y - (display.getY() / 2)));
+			Vector P_3d_x = right_vec.multiplyWithValue(-(x - (display.getX() / 2)));
+			Vector P_3d = camera_position_vec.sumWithVector(direction_vec.multiplyWithValue(screen_distance)).sumWithVector(P_3d_y).sumWithVector(P_3d_x);
+			primaryRay.setPointA(P_3d);
+
+			for (unsigned int i = 0; i < cubes.size(); i++) {
 				intersectionWithCube = cubes[i].getFirstIntersectionWithCube(primaryRay);
 				if (intersectionWithCube.getDot() != 1000) {
 					intersections[cubes[i].getNumber()] = intersectionWithCube;
 					objectsFound.push_back(cubes[i].getNumber());
 				}
 			}
-			for (int i = 0; i < spheres.size(); i++) {
+			for (unsigned int i = 0; i < spheres.size(); i++) {
 				intersectionWithSphere = spheres[i].getFirstIntersectionWithSphere(primaryRay);
 				if (intersectionWithSphere.getDot() != 1000) {
 					intersections[spheres[i].getNumber()] = intersectionWithSphere;
 					objectsFound.push_back(spheres[i].getNumber());
 				}
 			}
-			for (int i = 0; i < objectsFound.size(); i++) {
+			for (unsigned int i = 0; i < objectsFound.size(); i++) {
 				if ((intersections[objectsFound[i]].distanceToPoint(camera_position_vec) < distanceToEye) || (distanceToEye == 0)) {
 					distanceToEye = intersections[objectsFound[i]].distanceToPoint(camera_position_vec);
 					objectClosestIntersection = objectsFound[i];
 				}
 			}
-			if (objectClosestIntersection != 1000) {
+			if (objectClosestIntersection != -1000) {
 				for (int i = 0; i < cubes.size(); i++) {
 					if (objectClosestIntersection == cubes[i].getNumber()) {
+						validIntersection = cubes[i].getFirstIntersectionWithCube(primaryRay);
+						//-----------------------------------------------------------
+						intersectionPlane = cubes[i].getPlaneLastIntersection();
+						shadowRay.setPointB(validIntersection);
+						firstIntersectionShadowRay = cubes[i].getFirstIntersectionWithCube(shadowRay);
+						intersectionPlaneShadowRay = cubes[i].getPlaneLastIntersection();
+						double v;
+						if (intersectionPlane == intersectionPlaneShadowRay) {
+							v = ((1 - ((validIntersection.distanceToPoint(light_point) - closestIntersection) / differenceFarestClosestIntersection)) * 0.4) + 0.6;
+						}
+						else {
+							v = 0.4;
+						}
+						//-----------------------------------------------------------
+
 						if (cubes[i].getColor() == "red") {
-							objectColor.setHSV(0, 1, 1);
+							objectColor.setHSV(0, 1, v);
 						}
 						else if (cubes[i].getColor() == "green") {
-							objectColor.setHSV(120, 1, 1);
+							objectColor.setHSV(120, 1, v);
 						}
 						else if (cubes[i].getColor() == "lightblue") {
-							objectColor.setHSV(180, 1, 1);
+							objectColor.setHSV(180, 1, v);
 						}
 						else if (cubes[i].getColor() == "blue") {
-							objectColor.setHSV(251, 1, 1);
+							objectColor.setHSV(251, 1, v);
 						}
 						else if (cubes[i].getColor() == "yellow") {
-							objectColor.setHSV(50, 1, 1);
+							objectColor.setHSV(50, 1, v);
 						}
 						glColor3f(objectColor.getR(), objectColor.getG(), objectColor.getB());
 						glVertex2i(x, y);
@@ -196,20 +202,35 @@ void Camera::rayTrace() {
 				}
 				for (int i = 0; i < spheres.size(); i++) {
 					if (objectClosestIntersection == spheres[i].getNumber()) {
+						validIntersection = spheres[i].getFirstIntersectionWithSphere(primaryRay);
+						double v;
+						//-----------------------------------------------------------
+						shadowRay.setPointB(validIntersection);
+						if (round(spheres[i].getFirstIntersectionWithSphere(shadowRay).distanceToPoint(shadowRay.getPointA())*100) ==
+								round(validIntersection.distanceToPoint(shadowRay.getPointA())*100)) {
+							v = ((1 - ((validIntersection.distanceToPoint(light_point) - closestIntersection) / differenceFarestClosestIntersection)) * 0.6) + 0.4;
+						}
+						else {
+							v = 0.4;
+						}
+
+						//-----------------------------------------------------------
+
+
 						if (spheres[i].getColor() == "red") {
-							objectColor.setHSV(0, 1, 1);
+							objectColor.setHSV(0, 1, v);
 						}
 						else if (spheres[i].getColor() == "green") {
-							objectColor.setHSV(120, 1, 1);
+							objectColor.setHSV(120, 1, v);
 						}
 						else if (spheres[i].getColor() == "lightblue") {
-							objectColor.setHSV(180, 1, 1);
+							objectColor.setHSV(180, 1, v);
 						}
 						else if (spheres[i].getColor() == "blue") {
-							objectColor.setHSV(251, 1, 1);
+							objectColor.setHSV(251, 1, v);
 						}
 						else if (spheres[i].getColor() == "yellow") {
-							objectColor.setHSV(50, 1, 1);
+							objectColor.setHSV(50, 1, v);
 						}
 
 						glColor3f(objectColor.getR(), objectColor.getG(), objectColor.getB());
@@ -219,7 +240,7 @@ void Camera::rayTrace() {
 			}
 			objectsFound.clear();
 			distanceToEye = 0;
-			objectClosestIntersection = 1000;
+			objectClosestIntersection = -1000;
 			//*/
 		}
 	}

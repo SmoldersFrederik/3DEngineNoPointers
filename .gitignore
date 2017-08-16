@@ -3,3 +3,4 @@
 *.exe
 *.xml
 /Debug/
+*.o
