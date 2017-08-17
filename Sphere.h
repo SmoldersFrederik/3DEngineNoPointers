@@ -22,6 +22,7 @@ public:
 	virtual ~Sphere();
 	Vector getMiddle();
 	Vector getFirstIntersectionWithSphere(Line line);
+	Vector getFirstIntersectionWithSphere2(Line line);
 	string getColor();
 	int getNumber();
 private:
