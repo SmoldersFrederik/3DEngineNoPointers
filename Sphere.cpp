@@ -107,7 +107,7 @@ Vector Sphere::getFirstIntersectionWithSphere2(Line line) {
 		Vector intersection1(x1, y1, z1, 1);
 		Vector intersection2(x2, y2, z2, 1);
 
-		if (intersection1.distanceToPoint(line.getPointA()) < intersection2.distanceToPoint(line.getPointA())) {
+		if (intersection1.distanceToPoint(line.getPointB()) < intersection2.distanceToPoint(line.getPointB())) {
 			return intersection1;
 		}
 		else {

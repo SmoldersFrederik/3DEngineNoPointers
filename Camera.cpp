@@ -33,7 +33,7 @@ void Camera::rayTrace() {
 	Vector direction_vec = look_at.substractWithVector(camera_position_vec);
 	direction_vec.normalize();
 	Display display(1000, 800);
-	Vector light_point(0, 2000, 0, 1);
+	Vector light_point(-1000, 2000, 400, 1);
 
 
 	FileReader filereader;
@@ -97,7 +97,7 @@ void Camera::rayTrace() {
 	int intersectionPlane;
 	int intersectionPlaneShadowRay;
 	Line shadowRay;
-	shadowRay.setPointA(light_point);
+	shadowRay.setPointB(light_point);
 	Vector intersectionBetweenLightAndObject;
 
 
@@ -169,7 +169,7 @@ void Camera::rayTrace() {
 					if (objectClosestIntersection == cubes[i].getNumber()) {
 						validIntersection = cubes[i].getFirstIntersectionWithCube(primaryRay);
 						intersectionPlane = cubes[i].getPlaneLastIntersection();
-						shadowRay.setPointB(validIntersection);
+						shadowRay.setPointA(validIntersection);
 						firstIntersectionShadowRay = cubes[i].getFirstIntersectionWithCube(shadowRay);
 						intersectionPlaneShadowRay = cubes[i].getPlaneLastIntersection();
 						double v;
@@ -230,6 +230,100 @@ void Camera::rayTrace() {
 						else if (cubes[i].getColor() == "yellow") {
 							objectColor.setHSV(50, 1, v);
 						}
+						else if (spheres[i].getColor() == "chrome") {
+							vector<int> reflectedObjectsFound;
+							double distanceToObject = 0;
+							int objectClosestIntersectionReflection = -1000;
+
+							Vector reflectionIntersection;
+
+							Line reflectionRay = getReflectedLineOfCube(validIntersection, primaryRay, cubes[i]);
+
+							for (unsigned int j = 0; j < cubes.size(); j++) {
+								if (i != j) {
+									intersectionWithCube = cubes[j].getFirstIntersectionWithCube(reflectionRay);
+									if (intersectionWithCube.getDot() != 1000) {
+										intersections[cubes[j].getNumber()] = intersectionWithCube;
+										reflectedObjectsFound.push_back(cubes[j].getNumber());
+									}
+								}
+							}
+							for (unsigned int j = 0; j < spheres.size(); j++) {
+								intersectionWithSphere = spheres[j].getFirstIntersectionWithSphere2(reflectionRay);
+								if (intersectionWithSphere.getDot() != 1000) {
+									intersections[spheres[j].getNumber()] = intersectionWithSphere;
+									reflectedObjectsFound.push_back(spheres[j].getNumber());
+								}
+							}
+							for (unsigned int j = 0; j < reflectedObjectsFound.size(); j++) {
+								if ((intersections[reflectedObjectsFound[j]].distanceToPoint(reflectionRay.getPointB()) < distanceToObject) || (distanceToObject == 0)) {
+									distanceToObject = intersections[reflectedObjectsFound[j]].distanceToPoint(reflectionRay.getPointB());
+									objectClosestIntersectionReflection = reflectedObjectsFound[j];
+								}
+							}
+							if (objectClosestIntersectionReflection != -1000) {
+								for (unsigned int j = 0; j < cubes.size(); j++) {
+									if (i != j) {
+										if (objectClosestIntersectionReflection == cubes[j].getNumber()) {
+											Vector validIntersectionReflectionRay = cubes[j].getFirstIntersectionWithCube(reflectionRay);
+											Line oppositeReflectionRay(reflectionRay.getPointB(), validIntersectionReflectionRay);
+											if (round(validIntersection.distanceToPoint(validIntersectionReflectionRay)*1) ==
+													round(cubes[i].getFirstIntersectionWithCube(oppositeReflectionRay).distanceToPoint(validIntersectionReflectionRay))*1) {
+												if (cubes[j].getColor() == "red") {
+													objectColor.setHSV(0, 1, v);
+												}
+												else if (cubes[j].getColor() == "green") {
+													objectColor.setHSV(120, 1, v);
+												}
+												else if (cubes[j].getColor() == "lightblue") {
+													objectColor.setHSV(180, 1, v);
+												}
+												else if (cubes[j].getColor() == "blue") {
+													objectColor.setHSV(251, 1, v);
+												}
+												else if (cubes[j].getColor() == "yellow") {
+													objectColor.setHSV(50, 1, v);
+												}
+											}
+											else {
+												objectColor.setHSV(0, 0, v);
+											}
+										}
+									}
+								}
+								for (unsigned int j = 0; j < spheres.size(); j++) {
+									if (objectClosestIntersectionReflection == spheres[j].getNumber()) {
+										Vector validIntersectionReflectionRay = spheres[j].getFirstIntersectionWithSphere2(reflectionRay);
+										Line oppositeReflectionRay(reflectionRay.getPointB(), validIntersectionReflectionRay);
+										if (round(validIntersection.distanceToPoint(validIntersectionReflectionRay)*1) ==
+												round(cubes[i].getFirstIntersectionWithCube(oppositeReflectionRay).distanceToPoint(validIntersectionReflectionRay))*1) {
+											if (spheres[j].getColor() == "red") {
+												objectColor.setHSV(0, 1, v);
+											}
+											else if (spheres[j].getColor() == "green") {
+												objectColor.setHSV(120, 1, v);
+											}
+											else if (spheres[j].getColor() == "lightblue") {
+												objectColor.setHSV(180, 1, v);
+											}
+											else if (spheres[j].getColor() == "blue") {
+												objectColor.setHSV(251, 1, v);
+											}
+											else if (spheres[j].getColor() == "yellow") {
+												objectColor.setHSV(50, 1, v);
+											}
+										}
+										else {
+											objectColor.setHSV(0, 0, v);
+										}
+									}
+								}
+							}
+							else {
+								objectColor.setHSV(0, 0, v);
+							}
+
+						}
 						glColor3f(objectColor.getR(), objectColor.getG(), objectColor.getB());
 						glVertex2i(x, y);
 					}
@@ -237,8 +331,12 @@ void Camera::rayTrace() {
 				for (unsigned int i = 0; i < spheres.size(); i++) {
 					if (objectClosestIntersection == spheres[i].getNumber()) {
 						validIntersection = spheres[i].getFirstIntersectionWithSphere2(primaryRay);
-						shadowRay.setPointB(validIntersection);
+						shadowRay.setPointA(validIntersection);
 						double v;
+						Vector intersectionShadowRay = spheres[i].getFirstIntersectionWithSphere(shadowRay);
+						//if (round(validIntersection.getX()*100)/100 != round(intersectionShadowRay.getX()*100)/100 ||
+						//		round(validIntersection.getY()*100)/100 != round(intersectionShadowRay.getY()*100)/100 ||
+						//		round(validIntersection.getZ()*100)/100 != round(intersectionShadowRay.getZ()*100)/100) {
 						if (round(spheres[i].getFirstIntersectionWithSphere2(shadowRay).distanceToPoint(shadowRay.getPointA())*100) ==
 								round(validIntersection.distanceToPoint(shadowRay.getPointA())*100)) {
 							bool bool_intersectionBetweenLightAndObject = false;
@@ -297,6 +395,97 @@ void Camera::rayTrace() {
 							objectColor.setHSV(50, 1, v);
 						}
 						else if (spheres[i].getColor() == "chrome") {
+							vector<int> reflectedObjectsFound;
+							double distanceToObject = 0;
+							int objectClosestIntersectionReflection = -1000;
+
+							Vector reflectionIntersection;
+
+							Line reflectionRay = getReflectedLineOfSphere(validIntersection, primaryRay, spheres[i]);
+
+							for (unsigned int j = 0; j < cubes.size(); j++) {
+								intersectionWithCube = cubes[j].getFirstIntersectionWithCube(reflectionRay);
+								if (intersectionWithCube.getDot() != 1000) {
+									intersections[cubes[j].getNumber()] = intersectionWithCube;
+									reflectedObjectsFound.push_back(cubes[j].getNumber());
+								}
+							}
+							for (unsigned int j = 0; j < spheres.size(); j++) {
+								if (i != j) {
+									intersectionWithSphere = spheres[j].getFirstIntersectionWithSphere2(reflectionRay);
+									if (intersectionWithSphere.getDot() != 1000) {
+										intersections[spheres[j].getNumber()] = intersectionWithSphere;
+										reflectedObjectsFound.push_back(spheres[j].getNumber());
+									}
+								}
+							}
+							for (unsigned int j = 0; j < reflectedObjectsFound.size(); j++) {
+								if ((intersections[reflectedObjectsFound[j]].distanceToPoint(reflectionRay.getPointB()) < distanceToObject) || (distanceToObject == 0)) {
+									distanceToObject = intersections[reflectedObjectsFound[j]].distanceToPoint(reflectionRay.getPointB());
+									objectClosestIntersectionReflection = reflectedObjectsFound[j];
+								}
+							}
+							if (objectClosestIntersectionReflection != -1000) {
+								for (unsigned int j = 0; j < cubes.size(); j++) {
+									if (objectClosestIntersectionReflection == cubes[j].getNumber()) {
+										Vector validIntersectionReflectionRay = cubes[j].getFirstIntersectionWithCube(reflectionRay);
+										Line oppositeReflectionRay(reflectionRay.getPointB(), validIntersectionReflectionRay);
+										if (round(validIntersection.distanceToPoint(validIntersectionReflectionRay)*1) ==
+												round(spheres[i].getFirstIntersectionWithSphere2(oppositeReflectionRay).distanceToPoint(validIntersectionReflectionRay))*1) {
+											if (cubes[j].getColor() == "red") {
+												objectColor.setHSV(0, 1, v);
+											}
+											else if (cubes[j].getColor() == "green") {
+												objectColor.setHSV(120, 1, v);
+											}
+											else if (cubes[j].getColor() == "lightblue") {
+												objectColor.setHSV(180, 1, v);
+											}
+											else if (cubes[j].getColor() == "blue") {
+												objectColor.setHSV(251, 1, v);
+											}
+											else if (cubes[j].getColor() == "yellow") {
+												objectColor.setHSV(50, 1, v);
+											}
+										}
+										else {
+											objectColor.setHSV(0, 0, v);
+										}
+									}
+								}
+								for (unsigned int j = 0; j < spheres.size(); j++) {
+									if (i != j) {
+										if (objectClosestIntersectionReflection == spheres[j].getNumber()) {
+											Vector validIntersectionReflectionRay = spheres[j].getFirstIntersectionWithSphere2(reflectionRay);
+											Line oppositeReflectionRay(reflectionRay.getPointB(), validIntersectionReflectionRay);
+											if (round(validIntersection.distanceToPoint(validIntersectionReflectionRay)*1) ==
+													round(spheres[i].getFirstIntersectionWithSphere2(oppositeReflectionRay).distanceToPoint(validIntersectionReflectionRay))*1) {
+												if (spheres[j].getColor() == "red") {
+													objectColor.setHSV(0, 1, v);
+												}
+												else if (spheres[j].getColor() == "green") {
+													objectColor.setHSV(120, 1, v);
+												}
+												else if (spheres[j].getColor() == "lightblue") {
+													objectColor.setHSV(180, 1, v);
+												}
+												else if (spheres[j].getColor() == "blue") {
+													objectColor.setHSV(251, 1, v);
+												}
+												else if (spheres[j].getColor() == "yellow") {
+													objectColor.setHSV(50, 1, v);
+												}
+											}
+											else {
+												objectColor.setHSV(0, 0, v);
+											}
+										}
+									}
+								}
+							}
+							else {
+								objectColor.setHSV(0, 0, v);
+							}
 
 						}
 
@@ -310,5 +499,47 @@ void Camera::rayTrace() {
 			objectClosestIntersection = -1000;
 		}
 	}
+}
+
+
+Line Camera::getReflectedLineOfSphere(Vector intersection, Line primaryRay, Sphere sphere) {
+	Vector normalOfPlane = sphere.getMiddle().substractWithVector(intersection);
+	normalOfPlane.normalize();
+	//Vector directionVector = primaryRay.getPointB().substractWithVector(intersection);
+	Vector directionVector = intersection.substractWithVector(primaryRay.getPointB());
+	Vector reflectedVector = directionVector.substractWithVector(normalOfPlane.multiplyWithValue(2 * directionVector.dotProductWithVector(normalOfPlane)));
+	Line reflectedLine(intersection.sumWithVector(reflectedVector), intersection);
+	return reflectedLine;
+}
+
+
+Line Camera::getReflectedLineOfCube(Vector intersection, Line primaryRay, Cube cube) {
+	Vector normalOfPlane;
+	switch(cube.getPlaneLastIntersection()) {
+		case 1:
+			normalOfPlane = cube.getPlane1().calculateNormalOfPlane();
+			break;
+		case 2:
+			normalOfPlane = cube.getPlane2().calculateNormalOfPlane();
+			break;
+		case 3:
+			normalOfPlane = cube.getPlane3().calculateNormalOfPlane();
+			break;
+		case 4:
+			normalOfPlane = cube.getPlane4().calculateNormalOfPlane();
+			break;
+		case 5:
+			normalOfPlane = cube.getPlane5().calculateNormalOfPlane();
+			break;
+		case 6:
+			normalOfPlane = cube.getPlane6().calculateNormalOfPlane();
+			break;
+	}
+	normalOfPlane.normalize();
+	//Vector directionVector = primaryRay.getPointB().substractWithVector(intersection);
+	Vector directionVector = intersection.substractWithVector(primaryRay.getPointB());
+	Vector reflectedVector = directionVector.substractWithVector(normalOfPlane.multiplyWithValue(2 * directionVector.dotProductWithVector(normalOfPlane)));
+	Line reflectedLine(intersection.sumWithVector(reflectedVector), intersection);
+	return reflectedLine;
 }
 

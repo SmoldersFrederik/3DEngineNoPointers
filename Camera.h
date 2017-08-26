@@ -22,6 +22,8 @@ public:
 	Camera();
 	virtual ~Camera();
 	void rayTrace();
+	Line getReflectedLineOfSphere(Vector intersection, Line primaryRay, Sphere sphere);
+	Line getReflectedLineOfCube(Vector intersection, Line primaryRay, Cube cube);
 };
 
 #endif /* CAMERA_H_ */
