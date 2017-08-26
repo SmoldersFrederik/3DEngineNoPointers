@@ -123,7 +123,7 @@ void Camera::rayTrace() {
 				}
 			}
 			for (unsigned int i = 0; i < spheres.size(); i++) {
-				intersectionWithSphere = spheres[i].getFirstIntersectionWithSphere(primaryRay);
+				intersectionWithSphere = spheres[i].getFirstIntersectionWithSphere2(primaryRay);
 				if (intersectionWithSphere.getDot() != 1000) {
 					if (intersectionWithSphere.distanceToPoint(light_point) > farestIntersection || farestIntersection == 0) {
 						farestIntersection = intersectionWithSphere.distanceToPoint(light_point);
@@ -152,7 +152,7 @@ void Camera::rayTrace() {
 				}
 			}
 			for (unsigned int i = 0; i < spheres.size(); i++) {
-				intersectionWithSphere = spheres[i].getFirstIntersectionWithSphere(primaryRay);
+				intersectionWithSphere = spheres[i].getFirstIntersectionWithSphere2(primaryRay);
 				if (intersectionWithSphere.getDot() != 1000) {
 					intersections[spheres[i].getNumber()] = intersectionWithSphere;
 					objectsFound.push_back(spheres[i].getNumber());
@@ -174,7 +174,6 @@ void Camera::rayTrace() {
 						intersectionPlaneShadowRay = cubes[i].getPlaneLastIntersection();
 						double v;
 						if (intersectionPlane == intersectionPlaneShadowRay) {
-							//-----------------------------------------------------------
 							bool bool_intersectionBetweenLightAndObject = false;
 							for (unsigned int j = 0; j < cubes.size(); j++) {
 								if (cubes[i].getNumber() != cubes[j].getNumber()) {
@@ -196,40 +195,21 @@ void Camera::rayTrace() {
 									v = ((1 - ((validIntersection.distanceToPoint(light_point) - closestIntersection) / differenceFarestClosestIntersection)) * 0.4) + 0.6;
 								}
 							}
-
-							//shadowRay.setPointA(validIntersection);
-							//shadowRay.setPointB(light_point);
 							for (unsigned int j = 0; j < spheres.size(); j++) {
-								intersectionBetweenLightAndObject = spheres[j].getFirstIntersectionWithSphere(shadowRay);
-								cout << intersectionBetweenLightAndObject.getDot() << " \n";
+								intersectionBetweenLightAndObject = spheres[j].getFirstIntersectionWithSphere2(shadowRay);
 								if (intersectionBetweenLightAndObject.getDot() != 1000) {
 									if (intersectionBetweenLightAndObject.distanceToPoint(light_point) < validIntersection.distanceToPoint(light_point)) {
 										bool_intersectionBetweenLightAndObject = true;
 										v = 0.4;
-										//cout << "||||||||||||||||||||||||||||||||||||||||||||||||||||| \n";
 									}
 									else if (bool_intersectionBetweenLightAndObject == false) {
 										v = ((1 - ((validIntersection.distanceToPoint(light_point) - closestIntersection) / differenceFarestClosestIntersection)) * 0.4) + 0.6;
-										//cout << "---------------------------------------------------- \n";
 									}
 								}
 								else if (bool_intersectionBetweenLightAndObject == false) {
 									v = ((1 - ((validIntersection.distanceToPoint(light_point) - closestIntersection) / differenceFarestClosestIntersection)) * 0.4) + 0.6;
-									//cout << "test \n";
 								}
 							}
-							//-----------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-							//v = ((1 - ((validIntersection.distanceToPoint(light_point) - closestIntersection) / differenceFarestClosestIntersection)) * 0.4) + 0.6;
 						}
 						else {
 							v = 0.4;
@@ -256,21 +236,51 @@ void Camera::rayTrace() {
 				}
 				for (unsigned int i = 0; i < spheres.size(); i++) {
 					if (objectClosestIntersection == spheres[i].getNumber()) {
-						validIntersection = spheres[i].getFirstIntersectionWithSphere(primaryRay);
-						double v;
-						//-----------------------------------------------------------
+						validIntersection = spheres[i].getFirstIntersectionWithSphere2(primaryRay);
 						shadowRay.setPointB(validIntersection);
-						if (round(spheres[i].getFirstIntersectionWithSphere(shadowRay).distanceToPoint(shadowRay.getPointA())*100) ==
+						double v;
+						if (round(spheres[i].getFirstIntersectionWithSphere2(shadowRay).distanceToPoint(shadowRay.getPointA())*100) ==
 								round(validIntersection.distanceToPoint(shadowRay.getPointA())*100)) {
-							v = ((1 - ((validIntersection.distanceToPoint(light_point) - closestIntersection) / differenceFarestClosestIntersection)) * 0.6) + 0.4;
+							bool bool_intersectionBetweenLightAndObject = false;
+							for (unsigned int j = 0; j < spheres.size(); j++) {
+								if (spheres[i].getNumber() != spheres[j].getNumber()) {
+									intersectionBetweenLightAndObject = spheres[j].getFirstIntersectionWithSphere2(shadowRay);
+									if (intersectionBetweenLightAndObject.getDot() != 1000) {
+										if (intersectionBetweenLightAndObject.distanceToPoint(light_point) < validIntersection.distanceToPoint(light_point)) {
+											bool_intersectionBetweenLightAndObject = true;
+											v = 0.4;
+										}
+										else if (bool_intersectionBetweenLightAndObject == false) {
+											v = ((1 - ((validIntersection.distanceToPoint(light_point) - closestIntersection) / differenceFarestClosestIntersection)) * 0.6) + 0.4;
+										}
+									}
+									else if (bool_intersectionBetweenLightAndObject == false) {
+										v = ((1 - ((validIntersection.distanceToPoint(light_point) - closestIntersection) / differenceFarestClosestIntersection)) * 0.6) + 0.4;
+									}
+								}
+								else if (bool_intersectionBetweenLightAndObject == false) {
+									v = ((1 - ((validIntersection.distanceToPoint(light_point) - closestIntersection) / differenceFarestClosestIntersection)) * 0.6) + 0.4;
+								}
+							}
+							for (unsigned int j = 0; j < cubes.size(); j ++) {
+								intersectionBetweenLightAndObject = cubes[j].getFirstIntersectionWithCube(shadowRay);
+								if (intersectionBetweenLightAndObject.getDot() != 1000) {
+									if (intersectionBetweenLightAndObject.distanceToPoint(light_point) < validIntersection.distanceToPoint(light_point)) {
+										bool_intersectionBetweenLightAndObject = true;
+										v = 0.4;
+									}
+									else if (bool_intersectionBetweenLightAndObject == false) {
+										v = ((1 - ((validIntersection.distanceToPoint(light_point) - closestIntersection) / differenceFarestClosestIntersection)) * 0.6) + 0.4;
+									}
+								}
+								else if (bool_intersectionBetweenLightAndObject == false) {
+									v = ((1 - ((validIntersection.distanceToPoint(light_point) - closestIntersection) / differenceFarestClosestIntersection)) * 0.6) + 0.4;
+								}
+							}
 						}
 						else {
 							v = 0.4;
 						}
-
-						//-----------------------------------------------------------
-
-
 						if (spheres[i].getColor() == "red") {
 							objectColor.setHSV(0, 1, v);
 						}
@@ -286,6 +296,9 @@ void Camera::rayTrace() {
 						else if (spheres[i].getColor() == "yellow") {
 							objectColor.setHSV(50, 1, v);
 						}
+						else if (spheres[i].getColor() == "chrome") {
+
+						}
 
 						glColor3f(objectColor.getR(), objectColor.getG(), objectColor.getB());
 						glVertex2i(x, y);
@@ -295,7 +308,6 @@ void Camera::rayTrace() {
 			objectsFound.clear();
 			distanceToEye = 0;
 			objectClosestIntersection = -1000;
-			//*/
 		}
 	}
 }

@@ -1,3 +1,3 @@
-cube 0 define position:300,-300,-150 size:200 blue
+cube 0 define position:300,0,-250 size:300 blue
 cube 1 define position:-600,0,-175 size:250 red
-sphere 2 define position:300,0,-150 size:300 green
+sphere 2 define position:300,-400,-200 size:300 green

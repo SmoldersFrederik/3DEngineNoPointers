@@ -86,41 +86,43 @@ Vector Sphere::getFirstIntersectionWithSphere(Line line) {
 Vector Sphere::getFirstIntersectionWithSphere2(Line line) {
 	Vector noIntersection(0, 0, 0, 1000);
 
-	Vector lineDirection(
-			line.getPointB().getX()-line.getPointA().getX(),
-			line.getPointB().getY()-line.getPointA().getY(),
-			line.getPointB().getZ()-line.getPointA().getZ(),
-			1);
-	double a = pow(lineDirection.getMagnitude(), 2);
+	double a = pow((line.getPointB().getX() - line.getPointA().getX()), 2) + pow((line.getPointB().getY() - line.getPointA().getY()), 2) + pow((line.getPointB().getZ() - line.getPointA().getZ()), 2);
+	double b = 2 * ((line.getPointB().getX() - line.getPointA().getX()) * (line.getPointA().getX() - middle.getX()) + (line.getPointB().getY() - line.getPointA().getY()) * (line.getPointA().getY() - middle.getY()) + (line.getPointB().getZ() - line.getPointA().getZ()) * (line.getPointA().getZ() - middle.getZ()));
+	double c = pow(middle.getX(), 2) + pow(middle.getY(), 2) + pow(middle.getZ(), 2) + pow(line.getPointA().getX(), 2) + pow(line.getPointA().getY(), 2) + pow(line.getPointA().getZ(), 2) - 2 * (middle.getX() * line.getPointA().getX() + middle.getY() * line.getPointA().getY() + middle.getZ() * line.getPointA().getZ()) - pow(r, 2);
 
-	double b = lineDirection.multiplyWithValue(2).dotProductWithVector(line.getPointA().substractWithVector(middle));
+	double discriminant = pow(b, 2) - 4 * a * c;
 
-	double c = pow((line.getPointA().substractWithVector(middle)).getMagnitude(), 2) - pow(r, 2);
+	if (discriminant > 0) {
+		double t1 = (-b + sqrt(discriminant)) / (2 * a);
+		double t2 = (-b - sqrt(discriminant)) / (2 * a);
 
-	double d = pow(b, 2) - 4 * a * c;
+		double x1 = line.getPointA().getX() + ((line.getPointB().getX() - line.getPointA().getX()) * t1);
+		double y1 = line.getPointA().getY() + ((line.getPointB().getY() - line.getPointA().getY()) * t1);
+		double z1 = line.getPointA().getZ() + ((line.getPointB().getZ() - line.getPointA().getZ()) * t1);
 
-	if (d > 0) {
-		double u1 = (-b + sqrt(d))/(2*a);
-		double u2 = (-b - sqrt(d))/(2*a);
-		Vector intersection1 = line.getPointA().sumWithVector(lineDirection.multiplyWithValue(u1));
-		Vector intersection2 = line.getPointA().sumWithVector(lineDirection.multiplyWithValue(u2));
+		double x2 = line.getPointA().getX() + ((line.getPointB().getX() - line.getPointA().getX()) * t2);
+		double y2 = line.getPointA().getY() + ((line.getPointB().getY() - line.getPointA().getY()) * t2);
+		double z2 = line.getPointA().getZ() + ((line.getPointB().getZ() - line.getPointA().getZ()) * t2);
+
+		Vector intersection1(x1, y1, z1, 1);
+		Vector intersection2(x2, y2, z2, 1);
 
 		if (intersection1.distanceToPoint(line.getPointA()) < intersection2.distanceToPoint(line.getPointA())) {
-			intersection1.setDot(1);
 			return intersection1;
 		}
 		else {
-			intersection2.setDot(1);
 			return intersection2;
 		}
 	}
+	else if (discriminant == 0) {
+		double t = (-b) / (2 * a);
 
-	else if (d == 0) {
-		double u = (-b)/(2*a);
-		Vector intersection = line.getPointA().sumWithVector(lineDirection.multiplyWithValue(u));
-		return intersection;
+		double x = line.getPointA().getX() + ((line.getPointB().getX() - line.getPointA().getX()) * t);
+		double y = line.getPointA().getY() + ((line.getPointB().getY() - line.getPointA().getY()) * t);
+		double z = line.getPointA().getZ() + ((line.getPointB().getZ() - line.getPointA().getZ()) * t);
+
+		Vector intersection(x, y, z, 1);
 	}
-
 	else {
 		return noIntersection;
 	}
