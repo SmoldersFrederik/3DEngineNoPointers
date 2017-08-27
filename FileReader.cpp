@@ -18,52 +18,68 @@ FileReader::FileReader() {
 	int counter = 0;
 
 	while (getline (myfile, line)) {
-		string delimiter = " ";
-		size_t pos = 0;
-		string token;
-		string position;
+		if (line.find("#") == 0) {
 
-		pos = line.find(delimiter);
-		figure[counter] = line.substr(0, pos);
-		line.erase(0, pos + delimiter.length());
-		pos = line.find(delimiter);
-		number[counter] = atoi(line.substr(0, pos).c_str());
-		line.erase(0, pos + delimiter.length());
-		pos = line.find(delimiter);
-		action[counter] = line.substr(0, pos);
-		line.erase(0, pos + delimiter.length());
-
-		if (action[counter] == "define") {
-			pos = line.find(delimiter);
-			position = line.substr(0, pos);
-			line.erase(0, pos + delimiter.length());
-			delimiter = ":";
-			pos = position.find(delimiter);
-			position.erase(0, pos + delimiter.length());
-			delimiter = ",";
-			pos = position.find(delimiter);
-			positionX[counter] = atoi(position.substr(0, pos).c_str());
-			position.erase(0, pos + delimiter.length());
-			pos = position.find(delimiter);
-			positionY[counter] = atoi(position.substr(0, pos).c_str());
-			position.erase(0, pos + delimiter.length());
-			positionZ[counter] = atoi(position.c_str());
-
-			delimiter = " ";
-			string sizeLine;
-			pos = line.find(delimiter);
-			sizeLine = line.substr(0, pos);
-			line.erase(0, pos + delimiter.length());
-			delimiter = ":";
-			pos = sizeLine.find(delimiter);
-			size[counter] = atoi(sizeLine.erase(0, pos + delimiter.length()).c_str());
-			color[counter] = line;
 		}
+		else {
+			string delimiter = " ";
+			size_t pos = 0;
+			string token;
+			string position;
 
-		counter++;
+			pos = line.find(delimiter);
+			figure[counter] = line.substr(0, pos);
+			line.erase(0, pos + delimiter.length());
+			pos = line.find(delimiter);
+			number[counter] = atoi(line.substr(0, pos).c_str());
+			line.erase(0, pos + delimiter.length());
+			pos = line.find(delimiter);
+			action[counter] = line.substr(0, pos);
+			line.erase(0, pos + delimiter.length());
+
+			if (action[counter] == "define") {
+				pos = line.find(delimiter);
+				position = line.substr(0, pos);
+				line.erase(0, pos + delimiter.length());
+				delimiter = ":";
+				pos = position.find(delimiter);
+				position.erase(0, pos + delimiter.length());
+				delimiter = ",";
+				pos = position.find(delimiter);
+				positionX[counter] = atoi(position.substr(0, pos).c_str());
+				position.erase(0, pos + delimiter.length());
+				pos = position.find(delimiter);
+				positionY[counter] = atoi(position.substr(0, pos).c_str());
+				position.erase(0, pos + delimiter.length());
+				positionZ[counter] = atoi(position.c_str());
+
+				delimiter = " ";
+				string sizeLine;
+				pos = line.find(delimiter);
+				sizeLine = line.substr(0, pos);
+				line.erase(0, pos + delimiter.length());
+				delimiter = ":";
+				pos = sizeLine.find(delimiter);
+				size[counter] = atoi(sizeLine.erase(0, pos + delimiter.length()).c_str());
+				color[counter] = line;
+			}
+			else if (action[counter] == "translate") {
+				pos = line.find(delimiter);
+				translationDegrees[counter] = atoi(line.substr(0, pos).c_str());
+				line.erase(0, pos + delimiter.length());
+				delimiter = ",";
+				pos = line.find(delimiter);
+				transformX[counter] = atoi(line.substr(0, pos).c_str());
+				line.erase(0, pos + delimiter.length());
+				pos = line.find(delimiter);
+				transformY[counter] = atoi(line.substr(0, pos).c_str());
+				line.erase(0, pos + delimiter.length());
+				transformZ[counter] = atoi(line.c_str());
+			}
+			counter++;
+		}
 	}
-
-
+	myfile.close();
 }
 
 FileReader::~FileReader() {
@@ -100,4 +116,20 @@ int* FileReader::getSize() {
 
 string* FileReader::getColor() {
 	return color;
+}
+
+int* FileReader::getTranslationDegrees() {
+	return translationDegrees;
+}
+
+int* FileReader::getTransformX() {
+	return transformX;
+}
+
+int* FileReader::getTransformY() {
+	return transformY;
+}
+
+int* FileReader::getTransformZ() {
+	return transformZ;
 }

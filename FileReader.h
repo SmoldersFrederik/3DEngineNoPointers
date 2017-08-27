@@ -24,6 +24,10 @@ public:
 	int* getPositionZ();
 	int* getSize();
 	string* getColor();
+	int* getTranslationDegrees();
+	int* getTransformX();
+	int* getTransformY();
+	int* getTransformZ();
 
 
 
@@ -36,6 +40,10 @@ private:
 	int positionZ[10];
 	int size[10];
 	string color[10];
+	int translationDegrees[10];
+	int transformX[10];
+	int transformY[10];
+	int transformZ[10];
 };
 
 #endif /* FILEREADER_H_ */

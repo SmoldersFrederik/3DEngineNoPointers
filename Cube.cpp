@@ -110,61 +110,61 @@ Vector Cube::getFirstIntersectionWithCube(Line line) {
 	Vector intersectionWithPlane6 = plane6.intersectionWithLine(line);
 	if (plane1.intersectionBetweenBoundaries(intersectionWithPlane1)) {
 		if (distanceToIntersection1 == 0) {
-			distanceToIntersection1 = intersectionWithPlane1.distanceToPoint(line.getPointA());
+			distanceToIntersection1 = intersectionWithPlane1.distanceToPoint(line.getPointB());
 			counter1 = 1;
 		}
 		else {
-			distanceToIntersection2 = intersectionWithPlane1.distanceToPoint(line.getPointA());
+			distanceToIntersection2 = intersectionWithPlane1.distanceToPoint(line.getPointB());
 			counter2 = 1;
 		}
 	}
 	if (plane2.intersectionBetweenBoundaries(intersectionWithPlane2)) {
 		if (distanceToIntersection1 == 0) {
-			distanceToIntersection1 = intersectionWithPlane2.distanceToPoint(line.getPointA());
+			distanceToIntersection1 = intersectionWithPlane2.distanceToPoint(line.getPointB());
 			counter1 = 2;
 		}
 		else {
-			distanceToIntersection2 = intersectionWithPlane2.distanceToPoint(line.getPointA());
+			distanceToIntersection2 = intersectionWithPlane2.distanceToPoint(line.getPointB());
 			counter2 = 2;
 		}
 	}
 	if (plane3.intersectionBetweenBoundaries(intersectionWithPlane3)) {
 		if (distanceToIntersection1 == 0) {
-			distanceToIntersection1 = intersectionWithPlane3.distanceToPoint(line.getPointA());
+			distanceToIntersection1 = intersectionWithPlane3.distanceToPoint(line.getPointB());
 			counter1 = 3;
 		}
 		else {
-			distanceToIntersection2 = intersectionWithPlane3.distanceToPoint(line.getPointA());
+			distanceToIntersection2 = intersectionWithPlane3.distanceToPoint(line.getPointB());
 			counter2 = 3;
 		}
 	}
 	if (plane4.intersectionBetweenBoundaries(intersectionWithPlane4)) {
 		if (distanceToIntersection1 == 0) {
-			distanceToIntersection1 = intersectionWithPlane4.distanceToPoint(line.getPointA());
+			distanceToIntersection1 = intersectionWithPlane4.distanceToPoint(line.getPointB());
 			counter1 = 4;
 		}
 		else {
-			distanceToIntersection2 = intersectionWithPlane4.distanceToPoint(line.getPointA());
+			distanceToIntersection2 = intersectionWithPlane4.distanceToPoint(line.getPointB());
 			counter2 = 4;
 		}
 	}
 	if (plane5.intersectionBetweenBoundaries(intersectionWithPlane5)) {
 		if (distanceToIntersection1 == 0) {
-			distanceToIntersection1 = intersectionWithPlane5.distanceToPoint(line.getPointA());
+			distanceToIntersection1 = intersectionWithPlane5.distanceToPoint(line.getPointB());
 			counter1 = 5;
 		}
 		else {
-			distanceToIntersection2 = intersectionWithPlane5.distanceToPoint(line.getPointA());
+			distanceToIntersection2 = intersectionWithPlane5.distanceToPoint(line.getPointB());
 			counter2 = 5;
 		}
 	}
 	if (plane6.intersectionBetweenBoundaries(intersectionWithPlane6)) {
 		if (distanceToIntersection1 == 0) {
-			distanceToIntersection1 = intersectionWithPlane6.distanceToPoint(line.getPointA());
+			distanceToIntersection1 = intersectionWithPlane6.distanceToPoint(line.getPointB());
 			counter1 = 6;
 		}
 		else {
-			distanceToIntersection2 = intersectionWithPlane6.distanceToPoint(line.getPointA());
+			distanceToIntersection2 = intersectionWithPlane6.distanceToPoint(line.getPointB());
 			counter2 = 6;
 		}
 	}

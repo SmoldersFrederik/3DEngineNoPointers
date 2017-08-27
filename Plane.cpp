@@ -35,16 +35,8 @@ Vector Plane::getPointC() {
 }
 
 Vector Plane::calculateNormalOfPlane() {
-	Vector x(
-			pointB.getX() - pointA.getX(),
-			pointB.getY() - pointA.getY(),
-			pointB.getZ() - pointA.getZ(),
-			pointB.getDot() - pointA.getDot());
-	Vector y(
-			pointC.getX() - pointA.getX(),
-			pointC.getY() - pointA.getY(),
-			pointC.getZ() - pointA.getZ(),
-			pointC.getDot() - pointA.getDot());
+	Vector x = pointB.substractWithVector(pointA);
+	Vector y = pointC.substractWithVector(pointA);
 	Vector normal = x.crossProductWithVector(y);
 	return normal;
 }

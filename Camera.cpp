@@ -25,6 +25,7 @@ Camera::~Camera() {
 }
 
 void Camera::rayTrace() {
+	//Vector camera_position_vec(-1500, 0, 300, 1);
 	Vector camera_position_vec(500, 400, 1000, 1);
 	//Vector camera_position_vec(1000, 500, 0, 1);
 	Vector up_vec(0, 1, 0, 1);
@@ -33,7 +34,7 @@ void Camera::rayTrace() {
 	Vector direction_vec = look_at.substractWithVector(camera_position_vec);
 	direction_vec.normalize();
 	Display display(1000, 800);
-	Vector light_point(-1000, 2000, 400, 1);
+	Vector light_point(-1000, 2000, -400, 1);
 
 
 	FileReader filereader;
@@ -45,6 +46,10 @@ void Camera::rayTrace() {
 	int* positionZ = filereader.getPositionZ();
 	int* size = filereader.getSize();
 	string* color = filereader.getColor();
+	int* translationDegrees = filereader.getTranslationDegrees();
+	int* transformX = filereader.getTransformX();
+	int* transformY = filereader.getTransformY();
+	int* transformZ = filereader.getTransformZ();
 
 	Vector point[8];
 	Vector sphereMiddle;
@@ -54,16 +59,86 @@ void Camera::rayTrace() {
 
 	for (int i = 0; i < 10; i++) {
 		if (figure[i] == "cube") {
-			point[0].setValues(positionX[i] - size[i]/2, positionY[i] + size[i]/2, positionZ[i] + size[i]/2, 1);
-			point[0+1].setValues(positionX[i] + size[i]/2, positionY[i] + size[i]/2, positionZ[i] + size[i]/2, 1);
-			point[0+2].setValues(positionX[i] - size[i]/2, positionY[i] - size[i]/2, positionZ[i] + size[i]/2, 1);
-			point[0+3].setValues(positionX[i] + size[i]/2, positionY[i] - size[i]/2, positionZ[i] + size[i]/2, 1);
-			point[0+4].setValues(positionX[i] - size[i]/2, positionY[i] + size[i]/2, positionZ[i] - size[i]/2, 1);
-			point[0+5].setValues(positionX[i] + size[i]/2, positionY[i] + size[i]/2, positionZ[i] - size[i]/2, 1);
-			point[0+6].setValues(positionX[i] - size[i]/2, positionY[i] - size[i]/2, positionZ[i] - size[i]/2, 1);
-			point[0+7].setValues(positionX[i] + size[i]/2, positionY[i] - size[i]/2, positionZ[i] - size[i]/2, 1);
-			Cube cube(point[0], point[0+1], point[0+2], point[0+3], point[0+4], point[0+5], point[0+6], point[0+7], color[i], number[i]);
-			cubes.push_back(cube);
+			if (action[i] == "define") {
+				point[0].setValues(positionX[i] - size[i]/2, positionY[i] + size[i]/2, positionZ[i] + size[i]/2, 1);
+				point[0+1].setValues(positionX[i] + size[i]/2, positionY[i] + size[i]/2, positionZ[i] + size[i]/2, 1);
+				point[0+2].setValues(positionX[i] - size[i]/2, positionY[i] - size[i]/2, positionZ[i] + size[i]/2, 1);
+				point[0+3].setValues(positionX[i] + size[i]/2, positionY[i] - size[i]/2, positionZ[i] + size[i]/2, 1);
+				point[0+4].setValues(positionX[i] - size[i]/2, positionY[i] + size[i]/2, positionZ[i] - size[i]/2, 1);
+				point[0+5].setValues(positionX[i] + size[i]/2, positionY[i] + size[i]/2, positionZ[i] - size[i]/2, 1);
+				point[0+6].setValues(positionX[i] - size[i]/2, positionY[i] - size[i]/2, positionZ[i] - size[i]/2, 1);
+				point[0+7].setValues(positionX[i] + size[i]/2, positionY[i] - size[i]/2, positionZ[i] - size[i]/2, 1);
+				Cube cube(point[0], point[0+1], point[0+2], point[0+3], point[0+4], point[0+5], point[0+6], point[0+7], color[i], number[i]);
+				cubes.push_back(cube);
+			}
+			else if (action[i] == "translate") {
+				for (int j = 0; j < 10; j++) {
+					if ((number[i] == number[j]) &&  (action[j] == "define")) {
+						Matrix xRollMatrix;
+						Matrix yRollMatrix;
+						Matrix zRollMatrix;
+						Matrix translationMatrix;
+						xRollMatrix.xRollMatrix(translationDegrees[i]);
+						yRollMatrix.yRollMatrix(translationDegrees[i]);
+						zRollMatrix.zRollMatrix(translationDegrees[i]);
+						translationMatrix.translationMatrix(transformX[i], transformY[i], transformZ[i]);
+
+						point[0].setValues(positionX[j] - size[j]/2, positionY[j] + size[j]/2, positionZ[j] + size[j]/2, 1);
+						point[0+1].setValues(positionX[j] + size[j]/2, positionY[j] + size[j]/2, positionZ[j] + size[j]/2, 1);
+						point[0+2].setValues(positionX[j] - size[j]/2, positionY[j] - size[j]/2, positionZ[j] + size[j]/2, 1);
+						point[0+3].setValues(positionX[j] + size[j]/2, positionY[j] - size[j]/2, positionZ[j] + size[j]/2, 1);
+						point[0+4].setValues(positionX[j] - size[j]/2, positionY[j] + size[j]/2, positionZ[j] - size[j]/2, 1);
+						point[0+5].setValues(positionX[j] + size[j]/2, positionY[j] + size[j]/2, positionZ[j] - size[j]/2, 1);
+						point[0+6].setValues(positionX[j] - size[j]/2, positionY[j] - size[j]/2, positionZ[j] - size[j]/2, 1);
+						point[0+7].setValues(positionX[j] + size[j]/2, positionY[j] - size[j]/2, positionZ[j] - size[j]/2, 1);
+
+						point[0] = xRollMatrix.transformVector(point[0]);
+						point[0+1] = xRollMatrix.transformVector(point[0+1]);
+						point[0+2] = xRollMatrix.transformVector(point[0+2]);
+						point[0+3] = xRollMatrix.transformVector(point[0+3]);
+						point[0+4] = xRollMatrix.transformVector(point[0+4]);
+						point[0+5] = xRollMatrix.transformVector(point[0+5]);
+						point[0+6] = xRollMatrix.transformVector(point[0+6]);
+						point[0+7] = xRollMatrix.transformVector(point[0+7]);
+
+						point[0] = yRollMatrix.transformVector(point[0]);
+						point[0+1] = yRollMatrix.transformVector(point[0+1]);
+						point[0+2] = yRollMatrix.transformVector(point[0+2]);
+						point[0+3] = yRollMatrix.transformVector(point[0+3]);
+						point[0+4] = yRollMatrix.transformVector(point[0+4]);
+						point[0+5] = yRollMatrix.transformVector(point[0+5]);
+						point[0+6] = yRollMatrix.transformVector(point[0+6]);
+						point[0+7] = yRollMatrix.transformVector(point[0+7]);
+
+						point[0] = zRollMatrix.transformVector(point[0]);
+						point[0+1] = zRollMatrix.transformVector(point[0+1]);
+						point[0+2] = zRollMatrix.transformVector(point[0+2]);
+						point[0+3] = zRollMatrix.transformVector(point[0+3]);
+						point[0+4] = zRollMatrix.transformVector(point[0+4]);
+						point[0+5] = zRollMatrix.transformVector(point[0+5]);
+						point[0+6] = zRollMatrix.transformVector(point[0+6]);
+						point[0+7] = zRollMatrix.transformVector(point[0+7]);
+
+						point[0] = translationMatrix.transformVector(point[0]);
+						point[0+1] = translationMatrix.transformVector(point[0+1]);
+						point[0+2] = translationMatrix.transformVector(point[0+2]);
+						point[0+3] = translationMatrix.transformVector(point[0+3]);
+						point[0+4] = translationMatrix.transformVector(point[0+4]);
+						point[0+5] = translationMatrix.transformVector(point[0+5]);
+						point[0+6] = translationMatrix.transformVector(point[0+6]);
+						point[0+7] = translationMatrix.transformVector(point[0+7]);
+
+						for (unsigned int k = 0; k < cubes.size(); k++) {
+							if (cubes[k].getNumber() == number[i]) {
+								cubes.erase(cubes.begin() + k);
+							}
+						}
+
+						Cube cube(point[0], point[0+1], point[0+2], point[0+3], point[0+4], point[0+5], point[0+6], point[0+7], color[j], number[j]);
+						cubes.push_back(cube);
+					}
+				}
+			}
 		}
 		if (figure[i] == "sphere") {
 			sphereMiddle.setX(positionX[i]);
@@ -106,7 +181,7 @@ void Camera::rayTrace() {
 	Vector right_vec = direction_vec.crossProductWithVector(up_vec);
 	for (int y = 0; y < display.getY(); y++) {
 		for (int x = 0; x < display.getX(); x++) {
-			Vector P_3d_y = up_vec.multiplyWithValue(-(y - (display.getY() / 2)));
+			Vector P_3d_y = up_vec.multiplyWithValue(y - (display.getY() / 2));
 			Vector P_3d_x = right_vec.multiplyWithValue(x - (display.getX() / 2));
 			Vector P_3d = camera_position_vec.sumWithVector(direction_vec.multiplyWithValue(screen_distance)).sumWithVector(P_3d_y).sumWithVector(P_3d_x);
 			primaryRay.setPointA(P_3d);
@@ -139,8 +214,8 @@ void Camera::rayTrace() {
 
 	for (int y = 0; y < display.getY(); y++) {
 		for (int x = 0; x < display.getX(); x++) {
-			Vector P_3d_y = up_vec.multiplyWithValue((y - (display.getY() / 2)));
-			Vector P_3d_x = right_vec.multiplyWithValue(-(x - (display.getX() / 2)));
+			Vector P_3d_y = up_vec.multiplyWithValue(y - (display.getY() / 2));
+			Vector P_3d_x = right_vec.multiplyWithValue(x - (display.getX() / 2));
 			Vector P_3d = camera_position_vec.sumWithVector(direction_vec.multiplyWithValue(screen_distance)).sumWithVector(P_3d_y).sumWithVector(P_3d_x);
 			primaryRay.setPointA(P_3d);
 
@@ -230,7 +305,7 @@ void Camera::rayTrace() {
 						else if (cubes[i].getColor() == "yellow") {
 							objectColor.setHSV(50, 1, v);
 						}
-						else if (spheres[i].getColor() == "chrome") {
+						else if (cubes[i].getColor() == "chrome") {
 							vector<int> reflectedObjectsFound;
 							double distanceToObject = 0;
 							int objectClosestIntersectionReflection = -1000;
@@ -263,31 +338,33 @@ void Camera::rayTrace() {
 							}
 							if (objectClosestIntersectionReflection != -1000) {
 								for (unsigned int j = 0; j < cubes.size(); j++) {
-									if (i != j) {
-										if (objectClosestIntersectionReflection == cubes[j].getNumber()) {
-											Vector validIntersectionReflectionRay = cubes[j].getFirstIntersectionWithCube(reflectionRay);
-											Line oppositeReflectionRay(reflectionRay.getPointB(), validIntersectionReflectionRay);
-											if (round(validIntersection.distanceToPoint(validIntersectionReflectionRay)*1) ==
-													round(cubes[i].getFirstIntersectionWithCube(oppositeReflectionRay).distanceToPoint(validIntersectionReflectionRay))*1) {
-												if (cubes[j].getColor() == "red") {
-													objectColor.setHSV(0, 1, v);
-												}
-												else if (cubes[j].getColor() == "green") {
-													objectColor.setHSV(120, 1, v);
-												}
-												else if (cubes[j].getColor() == "lightblue") {
-													objectColor.setHSV(180, 1, v);
-												}
-												else if (cubes[j].getColor() == "blue") {
-													objectColor.setHSV(251, 1, v);
-												}
-												else if (cubes[j].getColor() == "yellow") {
-													objectColor.setHSV(50, 1, v);
-												}
+									if (objectClosestIntersectionReflection == cubes[j].getNumber()) {
+										Vector validIntersectionReflectionRay = cubes[j].getFirstIntersectionWithCube(reflectionRay);
+										Line oppositeReflectionRay(reflectionRay.getPointB(), validIntersectionReflectionRay);
+
+										if (round(validIntersection.distanceToPoint(validIntersectionReflectionRay)) ==
+												round(cubes[i].getFirstIntersectionWithCube(oppositeReflectionRay).distanceToPoint(validIntersectionReflectionRay))) {
+											if (cubes[j].getColor() == "red") {
+												objectColor.setHSV(0, 1, v);
 											}
-											else {
+											else if (cubes[j].getColor() == "green") {
+												objectColor.setHSV(120, 1, v);
+											}
+											else if (cubes[j].getColor() == "lightblue") {
+												objectColor.setHSV(180, 1, v);
+											}
+											else if (cubes[j].getColor() == "blue") {
+												objectColor.setHSV(251, 1, v);
+											}
+											else if (cubes[j].getColor() == "yellow") {
+												objectColor.setHSV(50, 1, v);
+											}
+											else if (cubes[j].getColor() == "chrome") {
 												objectColor.setHSV(0, 0, v);
 											}
+										}
+										else {
+											objectColor.setHSV(0, 0, v);
 										}
 									}
 								}
@@ -312,6 +389,9 @@ void Camera::rayTrace() {
 											else if (spheres[j].getColor() == "yellow") {
 												objectColor.setHSV(50, 1, v);
 											}
+											else if (spheres[j].getColor() == "chrome") {
+												objectColor.setHSV(0, 0, v);
+											}
 										}
 										else {
 											objectColor.setHSV(0, 0, v);
@@ -334,9 +414,6 @@ void Camera::rayTrace() {
 						shadowRay.setPointA(validIntersection);
 						double v;
 						Vector intersectionShadowRay = spheres[i].getFirstIntersectionWithSphere(shadowRay);
-						//if (round(validIntersection.getX()*100)/100 != round(intersectionShadowRay.getX()*100)/100 ||
-						//		round(validIntersection.getY()*100)/100 != round(intersectionShadowRay.getY()*100)/100 ||
-						//		round(validIntersection.getZ()*100)/100 != round(intersectionShadowRay.getZ()*100)/100) {
 						if (round(spheres[i].getFirstIntersectionWithSphere2(shadowRay).distanceToPoint(shadowRay.getPointA())*100) ==
 								round(validIntersection.distanceToPoint(shadowRay.getPointA())*100)) {
 							bool bool_intersectionBetweenLightAndObject = false;
@@ -447,6 +524,9 @@ void Camera::rayTrace() {
 											else if (cubes[j].getColor() == "yellow") {
 												objectColor.setHSV(50, 1, v);
 											}
+											else if (cubes[j].getColor() == "chrome") {
+												objectColor.setHSV(0, 0, v);
+											}
 										}
 										else {
 											objectColor.setHSV(0, 0, v);
@@ -454,31 +534,32 @@ void Camera::rayTrace() {
 									}
 								}
 								for (unsigned int j = 0; j < spheres.size(); j++) {
-									if (i != j) {
-										if (objectClosestIntersectionReflection == spheres[j].getNumber()) {
-											Vector validIntersectionReflectionRay = spheres[j].getFirstIntersectionWithSphere2(reflectionRay);
-											Line oppositeReflectionRay(reflectionRay.getPointB(), validIntersectionReflectionRay);
-											if (round(validIntersection.distanceToPoint(validIntersectionReflectionRay)*1) ==
-													round(spheres[i].getFirstIntersectionWithSphere2(oppositeReflectionRay).distanceToPoint(validIntersectionReflectionRay))*1) {
-												if (spheres[j].getColor() == "red") {
-													objectColor.setHSV(0, 1, v);
-												}
-												else if (spheres[j].getColor() == "green") {
-													objectColor.setHSV(120, 1, v);
-												}
-												else if (spheres[j].getColor() == "lightblue") {
-													objectColor.setHSV(180, 1, v);
-												}
-												else if (spheres[j].getColor() == "blue") {
-													objectColor.setHSV(251, 1, v);
-												}
-												else if (spheres[j].getColor() == "yellow") {
-													objectColor.setHSV(50, 1, v);
-												}
+									if (objectClosestIntersectionReflection == spheres[j].getNumber()) {
+										Vector validIntersectionReflectionRay = spheres[j].getFirstIntersectionWithSphere2(reflectionRay);
+										Line oppositeReflectionRay(reflectionRay.getPointB(), validIntersectionReflectionRay);
+										if (round(validIntersection.distanceToPoint(validIntersectionReflectionRay)*1) ==
+												round(spheres[i].getFirstIntersectionWithSphere2(oppositeReflectionRay).distanceToPoint(validIntersectionReflectionRay))*1) {
+											if (spheres[j].getColor() == "red") {
+												objectColor.setHSV(0, 1, v);
 											}
-											else {
+											else if (spheres[j].getColor() == "green") {
+												objectColor.setHSV(120, 1, v);
+											}
+											else if (spheres[j].getColor() == "lightblue") {
+												objectColor.setHSV(180, 1, v);
+											}
+											else if (spheres[j].getColor() == "blue") {
+												objectColor.setHSV(251, 1, v);
+											}
+											else if (spheres[j].getColor() == "yellow") {
+												objectColor.setHSV(50, 1, v);
+											}
+											else if (spheres[j].getColor() == "chrome") {
 												objectColor.setHSV(0, 0, v);
 											}
+										}
+										else {
+											objectColor.setHSV(0, 0, v);
 										}
 									}
 								}
